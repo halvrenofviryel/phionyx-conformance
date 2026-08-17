@@ -1,0 +1,62 @@
+{
+  "bundle": "phionyx Measurement Axioms self-audit — reproducible evidence bundle",
+  "scope": "the first two of the eleven findings in the self-audit (family: 'absence read as confirmation')",
+  "source_audit": "https://github.com/halvrenofviryel/measurement-axioms/blob/main/audit/PHIONYX_MEASUREMENT_AXIOMS_SELF_AUDIT_2026-08-01.md",
+  "purpose": "The self-audit stated its own gap: 'no reproduction command is published, and no per-finding record is given ... the bundle would make these findings independently reproducible' (that last clause is the self-audit's stated aspiration, quoted, not a claim made here). This bundle delivers the two concrete pieces it named as missing, for the first two findings: the buggy release + wheel digest, the file and line range, the fix commit, the fixed release + line range, an expected-vs-observed record, and a one-command reproduction. It moves these two from SUPPORTED_NARRATIVE toward reproducible; it does NOT achieve independent reproduction (which needs an outside reviewer) and does NOT make them independently verified — see verification_status.",
+  "line_range_frame": "line_range values reference audit_chain.py AS SHIPPED IN THE PINNED WHEEL (the artifact build_bundle.py runs), addressed by the wheel_sha256 below. The repository tree at the fix commit differs in absolute line numbers (extra headers/reflow); the wheel is the reproducible artifact, so its lines are cited.",
+  "target": {
+    "package": "phionyx-mcp-server",
+    "buggy_release": {"version": "0.2.0", "wheel_sha256": "060e2008429fb8ff84e87f4ee24fb9a12d1e1ddbfa27e31b2b0b38dd6e395608"},
+    "fixed_release": {"version": "0.2.1", "wheel_sha256": "4d29b9a0b9ec87882daae125d827bd799ca43bee4d86d00b481f2cc554b7bd51"},
+    "fix_commit": "adbbcb3383e9e95ca9bb52fdfd40f6ff905a8a20",
+    "fix_commit_date": "2026-08-02",
+    "fix_commit_subject": "fix(evidence): stop four published packages reporting a pass nobody measured",
+    "commit_binding_caveat": "the released wheels do not attest which commit built them; the release-to-commit binding is itself unverified"
+  },
+  "findings": [
+    {
+      "id": "SA-1",
+      "title": "a chain-integrity verifier returns valid for an empty chain",
+      "axiom": "MA-3.8 — a non-measurement must not be represented as a positive result",
+      "expected": "NOT_MEASURED: an empty chain has nothing to check, so valid must not be true",
+      "before": {
+        "version": "0.2.0",
+        "file": "phionyx_mcp_server/audit_chain.py",
+        "line_range": "417-426",
+        "behaviour": "verify_chain([]) returned {valid: true, checked: 0, broken_at: null, reason: null}",
+        "observed_status": "PASS (valid true) — the bug"
+      },
+      "after": {
+        "version": "0.2.1",
+        "file": "phionyx_mcp_server/audit_chain.py",
+        "line_range": "457,483-490",
+        "behaviour": "verify_chain([]) returns {valid: null, measurement_status: NOT_MEASURED, non_measurement_cause: input_absent}",
+        "observed_status": "NOT_MEASURED — fixed"
+      },
+      "reproduction": "python conformance/self_audit/build_bundle.py  (run in a 0.2.0 venv it exits 1 and records observed=PASS/valid; in a 0.2.1 venv it exits 0 and records NOT_MEASURED). Re-measured independently of this bundle by conformance scenario S5, assertion S5-A1.",
+      "verification_status": "first-party re-measured as fixed in 0.2.1; NOT independently reproduced"
+    },
+    {
+      "id": "SA-2",
+      "title": "a verifier-less call passes a tampered signature",
+      "axiom": "MA-3.8 / MA-3.10 — an unverified signature must not read as valid, and the record must state what was not checked",
+      "expected": "NOT_MEASURED with signatures_verified false: without a verifier the signature was never checked, so valid must not be true",
+      "before": {
+        "version": "0.2.0",
+        "file": "phionyx_mcp_server/audit_chain.py",
+        "line_range": "417,474",
+        "behaviour": "verify_chain(envelopes) took no verifier at all and returned {valid: true} for a chain whose signature had been tampered with; a shipped test asserted this as documented default behaviour",
+        "observed_status": "PASS (valid true) — the bug"
+      },
+      "after": {
+        "version": "0.2.1",
+        "file": "phionyx_mcp_server/audit_chain.py",
+        "line_range": "457,557-567",
+        "behaviour": "verify_chain(envelopes) without a verifier returns {valid: null, hash_chain_valid: true, signatures_verified: false, measurement_status: NOT_MEASURED}",
+        "observed_status": "NOT_MEASURED — fixed"
+      },
+      "reproduction": "python conformance/self_audit/build_bundle.py  (0.2.0 venv -> exit 1, observed valid true; 0.2.1 venv -> exit 0, valid null / signatures_verified false). Re-measured independently of this bundle by conformance scenario S5, assertion S5-A2.",
+      "verification_status": "first-party re-measured as fixed in 0.2.1; NOT independently reproduced"
+    }
+  ]
+}

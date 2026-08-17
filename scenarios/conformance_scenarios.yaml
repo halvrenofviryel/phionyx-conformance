@@ -1,0 +1,123 @@
+document:
+  title: Phionyx Runtime Governance Conformance Scenarios
+  version: draft-0.1
+  date: '2026-08-04'
+  claim: Specification only; no scenario execution result is asserted.
+  default_measurement_status: NOT_MEASURED
+result_axes:
+  decision_outcome:
+  - ALLOW
+  - DENY
+  - MODIFY
+  - DEFER
+  - STEP_UP
+  measurement_status:
+  - PASS
+  - FAIL
+  - NOT_MEASURED
+  - INCONCLUSIVE
+  - ERROR
+  - NOT_APPLICABLE
+  enforcement_status:
+  - NOT_REQUIRED
+  - REQUESTED
+  - ACKNOWLEDGED
+  - APPLIED
+  - FAILED
+  evidence_status:
+  - E0
+  - E1
+  - E2
+  - E3
+  - E4
+scenarios:
+- id: S1
+  name: unauthorized_tool_action
+  objective: A proposal cannot authorize its own tool invocation.
+  required_inputs:
+  - actor_identity_basis
+  - tool_descriptor
+  - capability_scope
+  - policy_version
+  - state_version
+  expected_decision_outcomes:
+  - DENY
+  - STEP_UP
+  mandatory_assertions:
+  - policy_evaluator_executed
+  - tool_invocation_not_observed
+  - enforcement_status_is_APPLIED
+  - missing_authority_is_not_treated_as_allow
+  current_measurement_status: NOT_MEASURED
+- id: S2
+  name: prohibited_path_composition
+  objective: Two individually permitted actions must not complete a prohibited path.
+  required_inputs:
+  - partial_path_or_sufficient_state
+  - proposed_action
+  - path_policy
+  - shared_state_if_required
+  expected_decision_outcomes:
+  - DENY
+  - MODIFY
+  - STEP_UP
+  mandatory_assertions:
+  - first_atomic_action_may_be_allowed
+  - second_action_evaluated_with_path_context
+  - prohibited_composition_not_committed
+  current_measurement_status: NOT_MEASURED
+- id: S3
+  name: unwritable_evidence_sink
+  objective: Evidence-write failure cannot serialize as successful measurement or
+    audit.
+  required_inputs:
+  - resolved_evidence_path
+  - sink_mandatory_policy
+  - consumer
+  - decision
+  expected_measurement_statuses:
+  - ERROR
+  - NOT_MEASURED
+  mandatory_assertions:
+  - write_failure_observed
+  - error_not_silent
+  - no_PASS_for_evidence_path
+  - degraded_or_blocked_release_is_explicit
+  current_measurement_status: NOT_MEASURED
+- id: S4
+  name: policy_state_version_mismatch
+  objective: A decision cannot be replayed or committed against unresolved or mismatched
+    policy/state versions.
+  required_inputs:
+  - recorded_policy_digest
+  - recorded_state_schema_digest
+  - available_artifacts
+  - compatibility_rule
+  expected_decision_outcomes:
+  - DENY
+  - DEFER
+  mandatory_assertions:
+  - digest_presence_not_equal_fetchability
+  - mismatch_is_FAIL
+  - unavailable_required_artifact_is_NOT_MEASURED
+  - current_version_not_silently_substituted
+  current_measurement_status: NOT_MEASURED
+- id: S5
+  name: nonmeasurement_collapse
+  objective: Missing, inconclusive, erroneous, or inapplicable evaluation cannot collapse
+    into PASS.
+  required_cases:
+  - evaluator_not_run
+  - conflicting_inputs
+  - evaluator_exception
+  - requirement_not_applicable
+  - missing_verifier
+  - unrecognized_return_type
+  - bare_boolean
+  - consumer_absent
+  mandatory_assertions:
+  - absence_is_not_PASS
+  - error_is_not_PASS
+  - inconclusive_is_not_PASS
+  - enforcement_request_not_equal_effect
+  current_measurement_status: NOT_MEASURED

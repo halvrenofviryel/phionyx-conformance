@@ -1,0 +1,206 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://phionyx.ai/non-normative/conformance/result-record-draft-0.1.schema.json",
+  "title": "Non-normative Phionyx conformance scenario result record",
+  "description": "Draft local schema. It is not AIREP, not a standard, and does not establish conformance.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "scenario_id",
+    "scenario_version",
+    "implementation",
+    "decision_outcome",
+    "measurement_status",
+    "enforcement_status",
+    "evidence_status",
+    "executed_at",
+    "assertions",
+    "source_artifacts",
+    "independent_rerun"
+  ],
+  "properties": {
+    "scenario_id": {
+      "type": "string",
+      "pattern": "^S[1-5]$"
+    },
+    "scenario_version": {
+      "type": "string"
+    },
+    "implementation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "commit",
+        "package_versions"
+      ],
+      "properties": {
+        "repository": {
+          "type": "string",
+          "format": "uri"
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "package_versions": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "decision_outcome": {
+      "enum": [
+        "ALLOW",
+        "DENY",
+        "MODIFY",
+        "DEFER",
+        "STEP_UP"
+      ]
+    },
+    "measurement_status": {
+      "enum": [
+        "PASS",
+        "FAIL",
+        "NOT_MEASURED",
+        "INCONCLUSIVE",
+        "ERROR",
+        "NOT_APPLICABLE"
+      ]
+    },
+    "enforcement_status": {
+      "enum": [
+        "NOT_REQUIRED",
+        "REQUESTED",
+        "ACKNOWLEDGED",
+        "APPLIED",
+        "FAILED"
+      ]
+    },
+    "evidence_status": {
+      "enum": [
+        "E0",
+        "E1",
+        "E2",
+        "E3",
+        "E4"
+      ]
+    },
+    "executed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "command": {
+      "type": "string"
+    },
+    "exit_code": {
+      "type": "integer"
+    },
+    "assertions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "status"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "PASS",
+              "FAIL",
+              "NOT_MEASURED",
+              "INCONCLUSIVE",
+              "ERROR",
+              "NOT_APPLICABLE"
+            ]
+          },
+          "evidence_ref": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "source_artifacts": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path_or_uri",
+          "sha256",
+          "resolvable"
+        ],
+        "properties": {
+          "path_or_uri": {
+            "type": "string"
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          },
+          "resolvable": {
+            "type": "boolean"
+          },
+          "redacted": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "required_consumer": {
+      "type": "string"
+    },
+    "consumer_acknowledged": {
+      "type": "boolean"
+    },
+    "effect_observer": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "independent_rerun": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "NOT_REQUESTED",
+            "REQUESTED",
+            "COMPLETED",
+            "DISPUTED"
+          ]
+        },
+        "reviewer": {
+          "type": "string"
+        },
+        "date": {
+          "type": "string",
+          "format": "date"
+        },
+        "result_ref": {
+          "type": "string"
+        }
+      }
+    },
+    "limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}
