@@ -11,8 +11,12 @@ tamper negative.** It is a per-decision / per-chain regression anchor, deliberat
 
 ## Contents
 
-- `chain.jsonl` — a FROZEN 2-record AIREP chain, produced once by the WP-12 RGE→AIREP projection
-  (`phionyx_mcp_server.airep_projection.rge_to_airep`, HMAC-signed demo). The golden reference.
+- `chain.jsonl` — a FROZEN 2-record projected chain, produced once by a first-party RGE→AIREP
+  projection (`phionyx_mcp_server.airep_projection.rge_to_airep`, HMAC-signed demo). The golden
+  reference. **The projection generator is UNRELEASED first-party work: it is not part of the
+  currently released public `phionyx-mcp-server` package. This repository therefore establishes
+  verification of the frozen projected artifact, not independent reproducibility of the
+  projection step, and no released conformant RGE→AIREP projection exists.**
 - `tampered.jsonl` — the same chain with one hash-domain field mutated and the integrity hash left
   unchanged, so recomputation must fail. The tamper negative.
 - `check_golden.py` — runs BOTH AIREP reference verifiers (`verify.py` + `verify.mjs`, from the

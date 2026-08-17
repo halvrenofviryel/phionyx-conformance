@@ -205,7 +205,7 @@ def main() -> int:
         "enforcement_status": "NOT_REQUIRED",
         "evidence_status": "E2",  # both envelopes signed + hash-chained
         "executed_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "command": "python conformance/scenarios/S2_prohibited_path_composition/run.py",
+        "command": "python scenarios/S2_prohibited_path_composition/run.py",
         "exit_code": exit_code,
         "assertions": [
             {"name": a["name"], "status": a["result"],

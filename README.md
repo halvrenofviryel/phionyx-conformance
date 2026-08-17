@@ -22,8 +22,16 @@ python -m venv .venv && .venv/bin/pip install phionyx-mcp-server==0.2.1 jsonsche
 .venv/bin/python run_all.py
 ```
 
-Each scenario writes a machine-readable record to `actual/` and is validated
-against `schemas/result_record.schema.json`.
+Each scenario writes a machine-readable record to `actual/` (scratch, regenerated
+per run) and is validated against `schemas/result_record.schema.json`.
+
+## Published baseline
+
+`expected/` holds the FROZEN machine-readable counterpart of the results table
+below: the five S1–S5 records generated 2026-08-17 against the pinned
+`phionyx-mcp-server==0.2.1` wheel, with `expected/MANIFEST.sha256` covering all
+five. A reviewer can re-run and diff their `actual/` records against this
+baseline; the baseline changes only by a deliberate, reviewed commit.
 
 ## Exit codes
 

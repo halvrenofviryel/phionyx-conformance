@@ -1,0 +1,57 @@
+{
+  "scenario_id": "S4",
+  "scenario_version": "draft-0.1",
+  "implementation": {
+    "repository": "https://github.com/halvrenofviryel/phionyx-mcp-server",
+    "commit": "2fd258e7afcd9e1a5c092a74edb663808835af5d",
+    "package_versions": {
+      "phionyx-mcp-server": "0.2.1"
+    }
+  },
+  "decision_outcome": "DEFER",
+  "measurement_status": "FAIL",
+  "enforcement_status": "NOT_REQUIRED",
+  "evidence_status": "E2",
+  "executed_at": "2026-08-17T19:03:04+00:00",
+  "command": "python scenarios/S4_policy_state_version_mismatch/run.py",
+  "exit_code": 1,
+  "assertions": [
+    {
+      "name": "S4-A1-digest-presence-not-equal-fetchability",
+      "status": "FAIL",
+      "note": "a recorded version/digest being present must not be treated as the artifact being fetchable | expected: the PASS depends on resolving the recorded version's artifact (verifier can receive/resolve one) | observed: recorded subject.version present=True; its artifact in available_artifacts=False; verify(recorded)=PASS reached with no resolution channel (params=['envelopes', 'verifier']) => presence accepted as fetchable"
+    },
+    {
+      "name": "S4-A2-mismatch-is-FAIL",
+      "status": "FAIL",
+      "note": "a decision recorded under a version that mismatches the required one must verify as FAIL | expected: the compatibility rule can enter the verifier and a mismatched recorded version yields FAIL | observed: compatibility rule {'required_version': 'policy-v2'} has no channel (resolution params=none); verify(recorded policy-v1)=PASS == verify(policy-v2)=PASS; verdict invariant to recorded version=True"
+    },
+    {
+      "name": "S4-A4-current-version-not-silently-substituted",
+      "status": "PASS",
+      "note": "the recorded version must not be silently replaced by the current one | expected: the recorded version is read back verbatim and substituting it is detected | observed: read_back='policy-v1'; after substituting to 'policy-CURRENT-substituted': valid=False, broken_at=0"
+    },
+    {
+      "name": "S4-A3-unavailable-required-artifact-is-NOT_MEASURED",
+      "status": "FAIL",
+      "note": "when a required policy/state artifact is unavailable, the verdict must be NOT_MEASURED, not PASS | expected: an unavailable required artifact produces a NOT_MEASURED attributable to it | observed: no artifact channel exists (resolution params=none), so the required-artifact premise cannot enter; verify(recorded)=PASS (valid=True) => no unavailable artifact can cause a NOT_MEASURED"
+    }
+  ],
+  "source_artifacts": [
+    {
+      "path_or_uri": "https://files.pythonhosted.org/packages/f8/3e/8eca30e18432eca3683c678e946d47ad603abd08e597ab57c013f3466b36/phionyx_mcp_server-0.2.1-py3-none-any.whl",
+      "sha256": "4d29b9a0b9ec87882daae125d827bd799ca43bee4d86d00b481f2cc554b7bd51",
+      "resolvable": true
+    }
+  ],
+  "independent_rerun": {
+    "status": "NOT_REQUESTED"
+  },
+  "limitations": [
+    "in-process surface: drives verify_chain directly, not a running MCP host round-trip",
+    "A3's 'required artifact unavailable' is a premise of the scenario, not a fetch this fixture attempts \u2014 the point is that verify_chain never requires or resolves such an artifact, so no verdict can be attributed to its absence; a host that added artifact resolution could exercise the fetch itself",
+    "A1/A2/A3 measure the ABSENCE of a version-compatibility evaluator, not a defect within one; A4 confirms the recorded version is hash-bound and tamper-evident",
+    "signature verification uses the fixture's own HMAC signer wrapped as the Verifier; the Ed25519 path and the shipped no-verifier default (see S5) are out of scope here",
+    "the installed distribution's binding to IMPL_COMMIT is not attested by the artifact itself"
+  ]
+}

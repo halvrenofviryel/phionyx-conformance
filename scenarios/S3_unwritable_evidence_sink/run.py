@@ -143,7 +143,7 @@ def main() -> int:
         "enforcement_status": "NOT_REQUIRED",
         "evidence_status": "E0",  # nothing was persisted
         "executed_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "command": "python conformance/scenarios/S3_unwritable_evidence_sink/run.py",
+        "command": "python scenarios/S3_unwritable_evidence_sink/run.py",
         "exit_code": exit_code,
         "assertions": [
             {"name": a["id"], "status": a["result"],

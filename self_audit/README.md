@@ -32,11 +32,11 @@ differs in absolute line numbers.
 ```bash
 # the bug, against the buggy release:
 python -m venv .before && .before/bin/pip install phionyx-mcp-server==0.2.0
-.before/bin/python conformance/self_audit/build_bundle.py    # exit 1, both BUG-REPRODUCED
+.before/bin/python self_audit/build_bundle.py    # exit 1, both BUG-REPRODUCED
 
 # the fix, against the fixed release:
 python -m venv .after && .after/bin/pip install phionyx-mcp-server==0.2.1
-.after/bin/python conformance/self_audit/build_bundle.py     # exit 0, both FIXED
+.after/bin/python self_audit/build_bundle.py     # exit 0, both FIXED
 ```
 
 Each run writes a machine-readable record to `actual/self_audit_bundle.<version>.json`

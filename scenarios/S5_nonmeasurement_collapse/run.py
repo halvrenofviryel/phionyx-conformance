@@ -164,7 +164,7 @@ def main() -> int:
         "enforcement_status": "NOT_REQUIRED",
         "evidence_status": "E2",
         "executed_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "command": "python conformance/scenarios/S5_nonmeasurement_collapse/run.py",
+        "command": "python scenarios/S5_nonmeasurement_collapse/run.py",
         "exit_code": exit_code,
         "assertions": [
             {"name": a["name"], "status": a["result"],

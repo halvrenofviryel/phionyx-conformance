@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # One command, from a clean clone, to the two .eval logs.
 #
-#   bash conformance/aisi_control_delivery/reproduce.sh
+#   bash control_delivery_eval/reproduce.sh
 #
 # The experiment itself uses no network and calls no model; the only network
 # use is pip installing two pinned packages into a throwaway virtualenv.

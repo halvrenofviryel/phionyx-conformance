@@ -156,7 +156,7 @@ def main() -> int:
         "install_location": location,
         "install_kind": kind,
         "measured_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "command": "python conformance/self_audit/build_bundle.py",
+        "command": "python self_audit/build_bundle.py",
         "exit_code": exit_code,
         "summary": summary,
         "artifact_binding_note": (

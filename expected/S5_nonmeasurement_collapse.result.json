@@ -1,0 +1,62 @@
+{
+  "scenario_id": "S5",
+  "scenario_version": "draft-0.1",
+  "implementation": {
+    "repository": "https://github.com/halvrenofviryel/phionyx-mcp-server",
+    "commit": "2fd258e7afcd9e1a5c092a74edb663808835af5d",
+    "package_versions": {
+      "phionyx-mcp-server": "0.2.1"
+    }
+  },
+  "decision_outcome": "ALLOW",
+  "measurement_status": "FAIL",
+  "enforcement_status": "NOT_REQUIRED",
+  "evidence_status": "E2",
+  "executed_at": "2026-08-17T19:03:04+00:00",
+  "command": "python scenarios/S5_nonmeasurement_collapse/run.py",
+  "exit_code": 1,
+  "assertions": [
+    {
+      "name": "S5-A1-empty-input-is-not-a-pass",
+      "status": "PASS",
+      "note": "an evaluator with nothing to check reports NOT_MEASURED, never valid | expected: valid is not True; measurement_status NOT_MEASURED | observed: valid=None measurement_status='NOT_MEASURED' cause='input_absent'"
+    },
+    {
+      "name": "S5-A2-unverified-signature-is-not-a-pass",
+      "status": "PASS",
+      "note": "a tampered signature must not read as valid merely because no verifier ran | expected: valid is not True; the answer says signatures were not verified | observed: valid=None measurement_status='NOT_MEASURED' signatures_verified=False"
+    },
+    {
+      "name": "S5-A3-intact-chain-without-verifier-claims-no-more-than-it-checked",
+      "status": "PASS",
+      "note": "an intact chain checked WITHOUT signature verification is still not 'valid' | expected: valid is not True; the unchecked scope is named | observed: valid=None measurement_status='NOT_MEASURED' reason='hash chain intact; signatures not verified \u2014 pass a verifier to check '"
+    },
+    {
+      "name": "S5-A4-a-real-failure-reports-as-a-failure",
+      "status": "PASS",
+      "note": "a genuinely broken chain reports FAIL, not NOT_MEASURED (the mirror-image collapse) | expected: valid is False and the break is located | observed: valid=False broken_at=1"
+    },
+    {
+      "name": "S5-A5-every-answer-carries-a-measurement-status",
+      "status": "FAIL",
+      "note": "the four states are distinguishable by a machine reading one field | expected: measurement_status present on all four results | observed: present on: empty, tampered, intact"
+    }
+  ],
+  "source_artifacts": [
+    {
+      "path_or_uri": "https://files.pythonhosted.org/packages/f8/3e/8eca30e18432eca3683c678e946d47ad603abd08e597ab57c013f3466b36/phionyx_mcp_server-0.2.1-py3-none-any.whl",
+      "sha256": "4d29b9a0b9ec87882daae125d827bd799ca43bee4d86d00b481f2cc554b7bd51",
+      "resolvable": true
+    }
+  ],
+  "independent_rerun": {
+    "status": "NOT_REQUESTED"
+  },
+  "limitations": [
+    "in-process surface: calls verify_chain directly, not through a running MCP host",
+    "signature verification with a real verifier is not exercised \u2014 the scenario is about what the answer claims when verification did NOT run",
+    "HMAC signer only; the Ed25519 path is not covered here",
+    "four states only: a missing policy file, an evaluator raising, and an unrecognised return type are named in the scenario spec and are not yet driven",
+    "the installed distribution's binding to IMPL_COMMIT is not attested by the artifact itself"
+  ]
+}

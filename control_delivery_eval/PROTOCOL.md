@@ -64,7 +64,7 @@ back with Inspect's own reader as part of the run.
 ## Reproduction
 
 ```bash
-bash conformance/aisi_control_delivery/reproduce.sh
+bash control_delivery_eval/reproduce.sh
 ```
 
 Pinned: `phionyx-mcp-server==0.2.1`, `inspect-ai==0.3.252`. The experiment uses
@@ -72,7 +72,7 @@ no network and calls no model; the only network use is pip installing those two
 packages into a throwaway virtualenv. It writes nothing outside that venv and
 `out/`. Runtime: seconds.
 
-View interactively: `inspect view --log-dir conformance/aisi_control_delivery/out/logs`
+View interactively: `inspect view --log-dir control_delivery_eval/out/logs`
 
 ## What this does not establish
 
@@ -103,10 +103,10 @@ View interactively: `inspect view --log-dir conformance/aisi_control_delivery/ou
 
 ## Related measurements in this repository
 
-- `conformance/scenarios/S3_unwritable_evidence_sink` — the same evidence-sink
+- `scenarios/S3_unwritable_evidence_sink` — the same evidence-sink
   failure as a standalone conformance scenario: the write failure is loud, but
   it is not bound to a governance decision (1/3).
-- `conformance/scenarios/S5_nonmeasurement_collapse` — whether missing,
+- `scenarios/S5_nonmeasurement_collapse` — whether missing,
   unverified and erroneous verification results collapse into approval (4/5).
   Its first three assertions are a first-party re-measurement of two findings
   this project published against itself; both are fixed in the released wheel

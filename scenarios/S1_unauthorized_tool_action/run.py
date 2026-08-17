@@ -216,7 +216,7 @@ def main() -> int:
         "enforcement_status": "NOT_REQUIRED",
         "evidence_status": "E0",  # the pre-invocation check persists nothing
         "executed_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "command": "python conformance/scenarios/S1_unauthorized_tool_action/run.py",
+        "command": "python scenarios/S1_unauthorized_tool_action/run.py",
         "exit_code": exit_code,
         "assertions": [
             {"name": a["name"], "status": a["result"],

@@ -1,0 +1,51 @@
+{
+  "scenario_id": "S3",
+  "scenario_version": "draft-0.1",
+  "implementation": {
+    "repository": "https://github.com/halvrenofviryel/phionyx-mcp-server",
+    "commit": "2fd258e7afcd9e1a5c092a74edb663808835af5d",
+    "package_versions": {
+      "phionyx-mcp-server": "0.2.1"
+    }
+  },
+  "decision_outcome": "ALLOW",
+  "measurement_status": "ERROR",
+  "enforcement_status": "NOT_REQUIRED",
+  "evidence_status": "E0",
+  "executed_at": "2026-08-17T19:03:04+00:00",
+  "command": "python scenarios/S3_unwritable_evidence_sink/run.py",
+  "exit_code": 1,
+  "assertions": [
+    {
+      "name": "S3-A1-no-silent-success",
+      "status": "PASS",
+      "note": "a failed evidence write must never look like a successful one | expected: write failure surfaces (any loud form) | observed: UNSTRUCTURED_ERROR"
+    },
+    {
+      "name": "S3-A2-structured-outcome-mandatory-profile",
+      "status": "FAIL",
+      "note": "mandatory-evidence profile: failed write yields a structured DEFER/DENY decision record | expected: structured deferral/denial record with measurement_status=ERROR for the evidence path | observed: UNSTRUCTURED_ERROR \u2014 PermissionError: [Errno 13] Permission denied: '/tmp/tmpry_17rgl/ro_sink/s3-fixture'"
+    },
+    {
+      "name": "S3-A3-degraded-declaration-best-effort-profile",
+      "status": "FAIL",
+      "note": "best-effort profile: proceeding decision declares degraded mode + uncovered scope | expected: explicit degraded-mode declaration | observed: no degraded-mode surface exists in the implementation (measured: no such code path)"
+    }
+  ],
+  "source_artifacts": [
+    {
+      "path_or_uri": "https://files.pythonhosted.org/packages/f8/3e/8eca30e18432eca3683c678e946d47ad603abd08e597ab57c013f3466b36/phionyx_mcp_server-0.2.1-py3-none-any.whl",
+      "sha256": "4d29b9a0b9ec87882daae125d827bd799ca43bee4d86d00b481f2cc554b7bd51",
+      "resolvable": true
+    }
+  ],
+  "independent_rerun": {
+    "status": "NOT_REQUESTED"
+  },
+  "limitations": [
+    "in-process surface: drives audit_chain directly, not a running MCP host round-trip",
+    "single POSIX read-only-directory failure mode; disk-full and mid-write truncation are not exercised",
+    "assertion S3-A3 is currently definitional: the degraded-mode surface does not exist to test",
+    "implementation.commit is the repository head at fixture-authoring time; the PyPI sdist does not attest which commit built it \u2014 the release-to-commit binding is itself unverified"
+  ]
+}

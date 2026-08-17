@@ -240,7 +240,7 @@ def main() -> int:
         "enforcement_status": "NOT_REQUIRED",
         "evidence_status": "E2",  # envelopes signed + hash-chained
         "executed_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
-        "command": "python conformance/scenarios/S4_policy_state_version_mismatch/run.py",
+        "command": "python scenarios/S4_policy_state_version_mismatch/run.py",
         "exit_code": exit_code,
         "assertions": [
             {"name": a["name"], "status": a["result"],
