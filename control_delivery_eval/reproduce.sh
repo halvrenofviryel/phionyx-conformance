@@ -21,7 +21,7 @@ for pkg in ("phionyx-mcp-server", "inspect_ai"):
     print(f"  {pkg}: {version(pkg)}")
 PY
 
-echo "=== 2/4 inject the four control-path failures ==="
+echo "=== 2/4 generate the four control-path condition records ==="
 "${VENV}/bin/python" "${HERE}/inject.py" "${HERE}/out"
 
 echo "=== 3/4 write baseline and instrumented .eval logs ==="
@@ -36,8 +36,8 @@ from inspect_ai.log import read_eval_log
 logs = Path(os.environ["LOGS"])
 for posture in ("baseline", "instrumented"):
     log = read_eval_log(str(logs / f"{posture}.eval"))
-    legible = sum(1 for s in log.samples if s.scores["failure_legible"].value == "C")
-    print(f"  {posture:13s} {legible}/{len(log.samples)} control failures legible")
+    legible = sum(1 for s in log.samples if s.scores["condition_legible"].value == "C")
+    print(f"  {posture:13s} {legible}/{len(log.samples)} represented conditions legible")
 PY
 
 echo

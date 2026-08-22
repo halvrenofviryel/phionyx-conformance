@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
-"""Turn the injection observations into two Inspect `.eval` logs — baseline and instrumented.
+"""Turn the case observations into two Inspect `.eval` logs — baseline and instrumented.
 
-One sample per injected failure. The score answers one question and only that
-one: *from this posture's record alone, can a reader establish that the control
-did not do its job?* A sample scores I (incorrect) when the record reports
-completion while the control silently did nothing — that is false assurance,
-and it is what the baseline log is expected to be full of.
+One sample per represented control-path condition. The score answers one
+question and only that one: *does this posture's record make the represented
+failure or non-measurement condition legible under the experiment's stated
+criterion?* A sample scores I (incorrect) when the record reports success-like
+completion while nothing in it makes the represented condition legible.
 
-Written against Inspect AI's public log API (`inspect_ai.log`), measured at
-version 0.3.252. It constructs logs directly rather than running a task,
-because there is no model in this experiment: the subject under evaluation is
-the RECORD, not an agent.
+Inspect's `.eval` format is used here as a serialization/replay container:
+logs are written through the public log API (`inspect_ai.log`, measured at
+version 0.3.252) and read back with Inspect's own reader. Nothing in this
+experiment tests Inspect itself. Logs are constructed directly rather than by
+running a task, because there is no model in this experiment: the subject
+under evaluation is the RECORD, not an agent.
 """
 from __future__ import annotations
 
@@ -32,17 +34,17 @@ from inspect_ai.log import (
 )
 from inspect_ai.scorer import Score
 
-TASK = "control_delivery_legibility"
+TASK = "control_path_evidence_legibility"
 
 
 def _sample(index: int, case: dict, posture: str) -> EvalSample:
     obs = case[posture]
-    legible = obs["failure_legible"]
+    legible = obs["condition_legible"]
     return EvalSample(
         id=case["case"],
         epoch=1,
         input=case["description"],
-        target="the record makes the control failure legible",
+        target="the record makes the represented failure or non-measurement condition legible",
         metadata={
             "posture": posture,
             "record": obs["record"],
@@ -50,9 +52,10 @@ def _sample(index: int, case: dict, posture: str) -> EvalSample:
             "verdict": case["verdict"],
         },
         scores={
-            "failure_legible": Score(
+            "condition_legible": Score(
                 value="C" if legible else "I",
-                answer="legible" if legible else "reports completion; control status unknowable",
+                answer="legible" if legible else "reports completion; the record does not establish "
+                                                 "whether the control/evidence observations were made",
                 explanation=obs["legibility_basis"],
             )
         },
@@ -61,19 +64,22 @@ def _sample(index: int, case: dict, posture: str) -> EvalSample:
 
 def _log(observations: list[dict], posture: str, created: str) -> EvalLog:
     samples = [_sample(i, case, posture) for i, case in enumerate(observations)]
-    legible = sum(1 for s in samples if s.scores["failure_legible"].value == "C")
+    legible = sum(1 for s in samples if s.scores["condition_legible"].value == "C")
     return EvalLog(
         eval=EvalSpec(
             created=created,
             task=f"{TASK}/{posture}",
-            dataset=EvalDataset(name="injected_control_path_failures", samples=len(samples)),
+            dataset=EvalDataset(name="represented_control_path_conditions", samples=len(samples)),
             model="none/record-under-evaluation",
             config=EvalConfig(),
             metadata={
                 "posture": posture,
-                "question": "does this posture's record establish that the control ran, "
-                            "that its directive was delivered, and that a missing policy or failed "
-                            "evidence write was not reported as success?",
+                "question": "does this posture's record make the represented failure or "
+                            "non-measurement condition legible under the experiment's stated "
+                            "criterion? For control delivery the question is whether a "
+                            "delivery/acknowledgement observation exists in the record and what "
+                            "it establishes — not whether delivery occurred, which this "
+                            "experiment does not measure.",
                 "no_network": True,
                 "no_model_calls": True,
             },
@@ -99,14 +105,15 @@ def main() -> int:
         log = _log(observations, posture, created)
         path = logs_dir / f"{posture}.eval"
         write_eval_log(log, str(path))
-        legible = sum(1 for s in log.samples if s.scores["failure_legible"].value == "C")
+        legible = sum(1 for s in log.samples if s.scores["condition_legible"].value == "C")
         written.append((posture, path, legible, len(log.samples)))
-        print(f"{posture:13s} {legible}/{len(log.samples)} failures legible -> {path}")
+        print(f"{posture:13s} {legible}/{len(log.samples)} conditions legible -> {path}")
 
     base = next(w for w in written if w[0] == "baseline")
     inst = next(w for w in written if w[0] == "instrumented")
-    print(f"\nDelta: {inst[2] - base[2]} of {base[3]} injected failures are legible only when the "
-          f"run is instrumented for measurement validity and control delivery.")
+    print(f"\nDelta: {inst[2] - base[2]} of {base[3]} represented conditions are legible only when "
+          f"measurement validity and control/evidence observations are explicit fields "
+          f"(fixture-local result).")
     print("Open with:  inspect view --log-dir " + str(logs_dir))
     return 0
 
